@@ -25,6 +25,7 @@ import sys
 import urllib.parse
 import threading
 import logging
+import time
 
 from lsprotocol.types import (
     TEXT_DOCUMENT_DID_CHANGE,
@@ -154,13 +155,21 @@ def did_close(ls, params: DidCloseTextDocumentParams):
 
 
 @trlc_server.feature(TEXT_DOCUMENT_DID_OPEN)
-def did_open(ls, params: DidOpenTextDocumentParams):
+def did_open(ls: TrlcLanguageServer, params: DidOpenTextDocumentParams):
     """Text document did open notification."""
-    ls.show_message("Text Document Did Open")
+    start_time = time.time()
+
     uri = params.text_document.uri
     document = ls.workspace.get_document(uri)
     content = document.source
     ls.queue_event("change", uri, content)
+    end_time = time.time()
+    ls.show_message(str(ls.trigger_parse.is_set()))
+    while ls.trigger_parse.is_set():
+        time.sleep(0.01)
+    ls.show_message(str(ls.trigger_parse.is_set()))
+    elapsed_time = end_time - start_time
+    ls.show_message(f"Text Document Did Open: DURATION:{elapsed_time:.2f}")
 
 
 @trlc_server.feature(

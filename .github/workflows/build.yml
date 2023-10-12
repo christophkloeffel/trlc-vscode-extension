@@ -2,7 +2,7 @@ name: TRLC Extension Build
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main","test/performance"]
   pull_request:
     branches: ["main"]
 
